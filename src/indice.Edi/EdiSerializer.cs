@@ -167,7 +167,7 @@ namespace indice.Edi
                     }
                     else if (stack.Count > 0 && stack.Peek().CachedReads.Count > 0) {
                         var allCachedReads = stack.Peek().CachedReads;
-                        while (allCachedReads.Count > 0 && TryCreateContainer(reader, stack, EdiStructureType.Element)) {
+                        while (allCachedReads.Count > 0 && TryCreateContainer(reader, stack, EdiStructureType.Segment)) {
                             if (stack.Peek().CachedReads.Any(x => x.HasValue)) {
                                 PopulateValue(reader, stack, ref structuralComparer);
                             }
