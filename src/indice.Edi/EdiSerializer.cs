@@ -27,6 +27,11 @@ namespace indice.Edi
         public bool EnableCompression { get; set; } = true;
 
         /// <summary>
+        /// Enables minimal value when Serializing to edi. Sets the internal <see cref="EdiWriter.EnableMinimalValue"/>. By default is set to true.
+        /// </summary>
+        public bool EnableMinimalValue { get; set; } = false;
+
+        /// <summary>
         /// If true will suppress any exceptions thrown due to bad escape sequences. Sets the internal <see cref="EdiReader.SuppressBadEscapeSequenceErrors"/>. By default is set to false.
         /// </summary>
         public bool SuppressBadEscapeSequenceErrors { get; set; }
@@ -714,6 +719,7 @@ namespace indice.Edi
         /// <param name="value">The <see cref="object"/> to serialize.</param>
         public void Serialize(EdiWriter ediWriter, object value) {
             ediWriter.EnableCompression = EnableCompression;
+            ediWriter.EnableMinimalValue = EnableMinimalValue;
             SerializeInternal(ediWriter, value, null);
             ediWriter.Close();
         }
@@ -730,6 +736,7 @@ namespace indice.Edi
         /// </param>
         public void Serialize(EdiWriter ediWriter, object value, Type objectType) {
             ediWriter.EnableCompression = EnableCompression;
+            ediWriter.EnableMinimalValue = EnableMinimalValue;
             SerializeInternal(ediWriter, value, objectType);
             ediWriter.Close();
         }

@@ -223,6 +223,11 @@ namespace indice.Edi
         public bool EnableCompression { get; set; }
 
         /// <summary>
+        /// Enable compression of edi messages. Avoids unnecessary leading zero and filling zero.
+        /// </summary>
+        public bool EnableMinimalValue { get; set; }
+
+        /// <summary>
         /// Escape decimal mark when encountered in text.
         /// </summary>
         public virtual bool EscapeDecimalMarkInText { get; set; }
@@ -1028,6 +1033,8 @@ namespace indice.Edi
                     throw CreateUnsupportedTypeException(this, value);
                 }
 #endif
+                if (EnableMinimalValue)
+                    picture = null;
 
                 WriteValue(this, ConvertUtils.GetTypeCode(value.GetType()), value, picture, format);
             }
