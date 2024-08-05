@@ -602,8 +602,20 @@ namespace indice.Edi
             //    throw new EdiException("More than one properties on type '{0}' have the '{1}' attribute but the 'Condition' attribute has a different search path declared."
             //        .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType));
             //}
-            var property = candidates.SingleOrDefault(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
+            //var property = candidates.SingleOrDefault(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
+            //                                                                                                 : p.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal])));
+            var propertyList = candidates.Where(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
                                                                                                              : p.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal])));
+
+            EdiPropertyDescriptor property;
+            if (propertyList.Count() < 2)
+                property = propertyList.FirstOrDefault();
+            else 
+            {
+                var pathinfo = propertyList.Select(x => new { Attribute =  x.ToString(), Value = ((EdiConditionAttribute)x.PathInfo).MatchValue});
+                throw new EdiException("Edi model got duplicated property conditions:\r\n{0}".FormatWith(CultureInfo.InvariantCulture, string.Join(Environment.NewLine, pathinfo)));
+            }
+
             if (property != null)
                 return property;
             return null;
