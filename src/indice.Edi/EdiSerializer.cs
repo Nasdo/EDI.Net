@@ -529,7 +529,7 @@ namespace indice.Edi
                 return null;
             }
             var property = default(EdiPropertyDescriptor);
-            if (reader.TokenType == EdiToken.SegmentName || currentStructure.CachedReads.Count > 0) {
+            if (reader.TokenType == EdiToken.SegmentName || (currentStructure.CachedReads.Count > 0)) {
                 var segmentName = reader.TokenType == EdiToken.SegmentName ? reader.Value : ((EdiPath)currentStructure.CachedReads.Peek().Path).Segment;
                 var matches = candidates.Where(p => segmentName.Equals(p.Segment)).ToArray();
                 if (matches.Length == 0) {
@@ -592,6 +592,7 @@ namespace indice.Edi
 
         private static EdiPropertyDescriptor ConditionalMatch(EdiReader reader, EdiStructure currentStructure, EdiStructureType newContainerType, params EdiPropertyDescriptor[] candidates) {
             if (!candidates.All(p => p.Conditions != null)) {
+                var errrorCandidates = candidates.Where(x => x.Conditions == null).ToList();
                 throw new EdiException(
                 "More than one properties on type '{0}' have the '{1}' attribute. Please add a 'Condition' attribute to all properties in order to discriminate where each {2} will go."
                     .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType, newContainerType));
@@ -661,6 +662,7 @@ namespace indice.Edi
                 var value = default(string);
                 var found = false;
                 if (cache.Count > 0) {
+                    var test = cache.Where(r => r.Path == path && r.Token.IsPrimitiveToken()).ToList();
                     var entry = cache.Where(r => r.Path == path && r.Token.IsPrimitiveToken()).SingleOrDefault();
                     if (!default(EdiEntry).Equals(entry)) {
                         found = true;
