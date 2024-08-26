@@ -25,7 +25,7 @@ public class EdiSerializer
         /// <summary>
         /// Enables minimal value when Serializing to edi. Sets the internal <see cref="EdiWriter.EnableMinimalValue"/>. By default is set to true.
         /// </summary>
-        public bool EnableMinimalValue { get; set; } = false;
+        public bool EnableMinimalValue { get; set; } = true;
 
         /// <summary>
         /// If true will suppress any exceptions thrown due to bad escape sequences. Sets the internal <see cref="EdiReader.SuppressBadEscapeSequenceErrors"/>. By default is set to false.
@@ -157,7 +157,7 @@ public class EdiSerializer
                     TryCreateContainer(reader, stack, EdiStructureType.Element);
                 } else if (stack.Count > 0 && stack.Peek().CachedReads.Count > 0) {
                     var allCachedReads = stack.Peek().CachedReads;
-                    while (allCachedReads.Count > 0 && TryCreateContainer(reader, stack, EdiStructureType.Element)) {
+                    while (allCachedReads.Count > 0 && TryCreateContainer(reader, stack, EdiStructureType.Segment)) {
                         if (stack.Peek().CachedReads.Any(x => x.HasValue)) {
                             PopulateValue(reader, stack, ref structuralComparer);
                         }
@@ -512,7 +512,7 @@ public class EdiSerializer
             return null;
         }
         var property = default(EdiPropertyDescriptor);
-        if (reader.TokenType == EdiToken.SegmentName || currentStructure.CachedReads.Count > 0) {
+        if (reader.TokenType == EdiToken.SegmentName || (currentStructure.CachedReads.Count > 0)) {
             var segmentName = reader.TokenType == EdiToken.SegmentName ? reader.Value : ((EdiPath)currentStructure.CachedReads.Peek().Path).Segment;
             var matches = candidates.Where(p => segmentName.Equals(p.Segment)).ToArray();
             if (matches.Length == 0) {
