@@ -586,6 +586,9 @@ public class EdiSerializer
         //    throw new EdiException("More than one properties on type '{0}' have the '{1}' attribute but the 'Condition' attribute has a different search path declared."
         //        .FormatWith(CultureInfo.InvariantCulture, currentStructure.Descriptor.ClrType.Name, newContainerType));
         //}
+        var test = candidates.Where(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
+                                                                                                         : p.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal]))).ToList();
+
         var property = candidates.SingleOrDefault(p => p.ConditionStackMode == EdiConditionStackMode.All ? p.Conditions.All(c => c.SatisfiedBy(searchResults[c.PathInternal]))
                                                                                                          : p.Conditions.Any(c => c.SatisfiedBy(searchResults[c.PathInternal])));
         if (property != null)
@@ -633,6 +636,7 @@ public class EdiSerializer
             var value = default(string);
             var found = false;
             if (cache.Count > 0) {
+                var test = cache.Where(r => r.Path == path && r.Token.IsPrimitiveToken()).ToList();
                 var entry = cache.Where(r => r.Path == path && r.Token.IsPrimitiveToken()).SingleOrDefault();
                 if (!default(EdiEntry).Equals(entry)) {
                     found = true;
